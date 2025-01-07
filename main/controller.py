@@ -269,7 +269,7 @@ def call_status_updating(data):
 
 
 
-def get_calls_list(data):
+def get_calls_list(data):#all do as get
     if not data:
         return jsonify({'error': 'No data provided'}), 401
     try:
