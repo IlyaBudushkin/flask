@@ -15,52 +15,52 @@ def get_db_connection():
 
 
 
-# def get_measurement_type(data):
-#     if not data:
-#         return jsonify({'error': 'No data provided'}), 401
-#     try:
-#         conn = get_db_connection()
-#         cursor = conn.cursor()
-#
-#         type_id = data.get('type_id')
-#
-#         query = "SELECT type_name FROM types_of_measurements WHERE type_id = %s"
-#         cursor.execute(query, (type_id,))
-#         type = cursor.fetchone()
-#         cursor.close()
-#         conn.close()
-#         return jsonify({'type': type[0]}), 200
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
+def get_product_type(data):
+    if not data:
+        return jsonify({'error': 'No data provided'}), 401
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        type_id = data.get('type_id')
+
+        query = "SELECT type_name FROM product_type WHERE product_type_id = %s"
+        cursor.execute(query, (type_id,))
+        type = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return jsonify({'type': type[0]}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 
-# def set_measurement_type(data):
-#     if not data:
-#         return jsonify({'error': 'No data provided'}), 401
-#     try:
-#         conn = get_db_connection()
-#         cursor = conn.cursor()
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
-#
-#     type_name = data.get('type_name')
-#
-#     query = "SELECT type_id FROM types_of_measurements WHERE type_name = %s"
-#     cursor.execute(query, (type_name,))
-#     type_id = cursor.fetchone()
-#     if not type_id:
-#         insert_query = "INSERT INTO types_of_measurements (type_name) VALUES (%s)"
-#         cursor.execute(insert_query, (type_name,))
-#         conn.commit()
-#         cursor.close()
-#         conn.close()
-#         try:
-#             return jsonify({'type_id': 'new type added'}), 200
-#         except Exception as e:
-#             return jsonify({'error': str(e)}), 500
-#     else:
-#         return jsonify({'error': 'Type already exists'}), 400
+def set_product_type(data):
+    if not data:
+        return jsonify({'error': 'No data provided'}), 401
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    type_name = data.get('type_name')
+
+    query = "SELECT product_type_id FROM product_type WHERE type_name = %s"
+    cursor.execute(query, (type_name,))
+    product_type_id = cursor.fetchone()
+    if not product_type_id:
+        insert_query = "INSERT INTO product_type (type_name) VALUES (%s)"
+        cursor.execute(insert_query, (type_name,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        try:
+            return jsonify({'type_id': 'new type added'}), 200
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    else:
+        return jsonify({'error': 'Type already exists'}), 400
 
 
 
@@ -126,63 +126,93 @@ def get_user(data):
 
 
 
-# def set_measurement(data):
-#     if not data:
-#         return jsonify({'error': 'No data provided'}), 401
-#     try:
-#         conn = get_db_connection()
-#         cursor = conn.cursor()
-#         measurement_types = data.get('types_of_measurements')#fk
-#         user_name = data.get('user_name')#fk
-#         productStatus = data.get('product_status')#fk
-#
-#         insert_query = """
-#             INSERT INTO list_of_measurements (type_id , user_id, prod_status_id,
-#                      point_of_measurement, description, date_of_creating,name,report_1,report_2)
-#             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-#             """
-#
-#         query = "SELECT type_id FROM types_of_measurements WHERE type_name = %s"
-#         cursor.execute(query, (measurement_types,))
-#         type_id = cursor.fetchone()
-#         if not type_id:
-#             return jsonify({'error': 'No types of measurements found'}), 401
-#
-#         query = "SELECT user_id FROM users WHERE name = %s"
-#         cursor.execute(query, (user_name,))
-#         user_id = cursor.fetchone()
-#         if not user_id:
-#             return jsonify({'error': 'No user_name found'}), 401
-#
-#         query = "SELECT prod_status_id FROM product_status WHERE status = %s"
-#         cursor.execute(query, (productStatus,))
-#         product_status_id = cursor.fetchone()
-#         if not product_status_id:
-#             return jsonify({'error': 'No product_status_id found'}), 401
-#
-#         cursor.execute(insert_query, (
-#                                     type_id,
-#                                     user_id,
-#                                     product_status_id,
-#                                     data['point_of_measurement'],
-#                                     data['description'],
-#                                     data['date_of_creating'],
-#                                     data['name'],
-#                                     data['report_1'],
-#                                     data['report_2']))
-#         conn.commit()
-#
-#         return jsonify({'message': 'Data added successfully'}), 200
-#
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
-#
-#     finally:
-#         cursor.close()
-#         conn.close()
-#
-#
-#
+def set_product(data):
+    if not data:
+        return jsonify({'error': 'No data provided'}), 401
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        insert_query = """
+                INSERT INTO products (product_type_id, prod_status_id , description, date_of_creating, 
+                         name, photo) 
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """
+        type_name = data.get('type_name')
+        query = "SELECT product_type_id FROM product_type WHERE type_name = %s"
+        cursor.execute(query, (type_name,))
+        product_type_id = cursor.fetchone()
+        if not product_type_id:
+            return jsonify({'error': 'No product type'}), 401
+
+        prod_status = data.get('product_status')
+        query = "SELECT prod_status_id FROM product_status WHERE status = %s"
+        cursor.execute(query, (prod_status,))
+        product_status_id = cursor.fetchone()
+        if not product_status_id:
+            return jsonify({'error': 'No product type'}), 401
+
+        cursor.execute(insert_query, (
+            product_type_id,
+            product_status_id,
+            data['description'],
+            data['date_of_creating'],
+            data['name'],
+            data['photo']))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'message': 'Data added successfully'}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+def set_shopping_list(data):
+    if not data:
+        return jsonify({'error': 'No data provided'}), 401
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        product_name = data.get('product_name')#fk
+        user_name = data.get('user_name')#fk
+
+        insert_query = """
+            INSERT INTO shopping_list (user_id, products_id)
+            VALUES (%s, %s)
+            """
+
+        query = "SELECT products_id FROM products WHERE name = %s"
+        cursor.execute(query, (product_name,))
+        type_id = cursor.fetchone()
+        if not type_id:
+            return jsonify({'error': 'No types of measurements found'}), 401
+
+        query = "SELECT user_id FROM users WHERE name = %s"
+        cursor.execute(query, (user_name,))
+        user_id = cursor.fetchone()
+        if not user_id:
+            return jsonify({'error': 'No user_name found'}), 401
+
+
+        cursor.execute(insert_query, (
+                                    user_id,
+                                    type_id))
+        conn.commit()
+
+        return jsonify({'message': 'Data added successfully'}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+
 # def get_measurement(data):
 #     if not data:
 #         return jsonify({'error': 'No data provided'}), 401

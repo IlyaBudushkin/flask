@@ -46,24 +46,24 @@ def get_call():
         return get_calls_list(data,'post')
 
 
-# @app.route('/get_type', methods=['POST'])
-# def get_type():
-#     data = request.json
-#     return get_measurement_type(data)
-#
-#
-# @app.route('/set_type', methods=['POST'])
-# def set_type():
-#     data = request.json
-#     return set_measurement_type(data)
-#
-#
-# @app.route('/set_mej', methods=['POST'])
-# def set_mej():
-#     data = request.get_json()
-#     return set_measurement(data)
-#
-#
+@app.route('/get_type', methods=['POST'])
+def get_type():
+    data = request.json
+    return get_product_type(data)
+
+
+@app.route('/set_type', methods=['POST'])
+def set_type():
+    data = request.json
+    return set_product_type(data)
+
+
+@app.route('/set_shopping_list', methods=['POST'])
+def set_shopping():
+    data = request.get_json()
+    return set_shopping_list(data)
+
+
 # @app.route('/get_mej', methods=['POST'])
 # def get_mej():
 #     data = request.get_json()
