@@ -269,22 +269,46 @@ def call_status_updating(data):
 
 
 
-def get_calls_list(data):#all do as get
-    if not data:
-        return jsonify({'error': 'No data provided'}), 401
+def get_calls_list(data,metod):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        if data['person'] == 'all':
-            query = "SELECT * FROM requests_for_a_call"
+        if metod == 'get':
+            query = ("SELECT requests_for_a_call.id, "
+                     "requests_for_a_call.user_id, "
+                     "requests_for_a_call.name, "
+                     "requests_for_a_call.phone_number, "
+                     "requests_for_a_call.date_of_application_processing, "
+                     "requests_for_a_call.application_date, "
+                     "requests_for_a_call.qestion, "
+                     "call_statuses.status AS call_status "
+                     "FROM requests_for_a_call "
+                     "JOIN call_statuses ON requests_for_a_call.call_status_id = call_statuses.call_status_id")
             cursor.execute(query)
             list_of_requests = cursor.fetchall()
             cursor.close()
             conn.close()
             return jsonify({'list_of_requests': list_of_requests}), 200
         else:
-            query = "SELECT * FROM requests_for_a_call WHERE id = %s"
+            if not data:
+                return jsonify({'error': 'No data provided'}), 401
+            query = """SELECT 
+                           requests_for_a_call.id, 
+                           requests_for_a_call.user_id, 
+                           requests_for_a_call.name, 
+                           requests_for_a_call.phone_number, 
+                           requests_for_a_call.date_of_application_processing, 
+                           requests_for_a_call.application_date, 
+                           requests_for_a_call.qestion, 
+                           call_statuses.status AS call_status 
+                       FROM 
+                           requests_for_a_call 
+                       JOIN 
+                           call_statuses ON requests_for_a_call.call_status_id = call_statuses.call_status_id 
+                       WHERE 
+                           requests_for_a_call.id = %s"""
+
             cursor.execute(query, (data['person'],))
             list_of_requests = cursor.fetchall()
             cursor.close()

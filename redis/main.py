@@ -25,22 +25,19 @@ def set_call():
     return set_data_for_call(data)
 
 
-@app.route('/delete_calldelete_call', methods=['DELETE'])
+@app.route('/delete_call', methods=['DELETE'])
 def delete_call():
     data = request.get_json()
     return delete_request_of_call(data)
 
 
-@app.route('/call_status_update', methods=['POST'])
-def call_status_update():
-    data = request.get_json()
-    return call_status_updating(data)
-
-
 @app.route('/get_call', methods=['GET', 'POST'])
 def get_call():
-    data = request.get_json()
-    return get_calls_list(data)
+    if request.method == 'GET':
+        return get_calls_list(data=None,metod='get')
+    else:
+        data = request.get_json()
+        return get_calls_list(data, 'post')
 
 
 @app.errorhandler(404)

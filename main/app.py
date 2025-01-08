@@ -37,10 +37,13 @@ def call_status_update():
     return call_status_updating(data)
 
 
-@app.route('/get_call', methods=['POST'])
+@app.route('/get_call', methods=['GET','POST'])
 def get_call():
-    data = request.get_json()
-    return get_calls_list(data)
+    if request.method == 'GET':
+        return get_calls_list(data=None,metod='get')
+    else:
+        data = request.get_json()
+        return get_calls_list(data,'post')
 
 
 @app.route('/get_type', methods=['POST'])
